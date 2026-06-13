@@ -1,0 +1,5 @@
+my/
+__pycache__/
+*.db
+users.db
+.vscode/
