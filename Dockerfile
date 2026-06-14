@@ -17,13 +17,13 @@ RUN useradd -m -u 1000 user
 # Copy the rest of the application files
 COPY --chown=user:user . /app
 
-# Switch to the non-root user
-USER user
-
 # Set permissions so the app can create and write to the SQLite database
 # We change permissions of the app directory because SQLite needs to create journal files alongside the .db file
 RUN chmod 777 /app
 RUN touch /app/users.db && chmod 666 /app/users.db
+
+# Switch to the non-root user
+USER user
 
 # Expose port 7860 as required by Hugging Face Spaces
 EXPOSE 7860

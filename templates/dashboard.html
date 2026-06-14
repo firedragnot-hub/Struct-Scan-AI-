@@ -570,6 +570,21 @@
       .nav-links { display: none; }
       .container, .container-sm { padding: 0 18px; }
     }
+    body.dark-theme {
+      --bg: #121212;
+      --bg-elev: #1e1e1e;
+      --bg-soft: #2a2a2a;
+      --bg-tint: #242424;
+      --ink: #ffffff;
+      --ink-2: #e0e0e0;
+      --muted: #a0a0a0;
+      --muted-2: #808080;
+      --line: rgba(255, 255, 255, 0.15);
+      --line-strong: rgba(255, 255, 255, 0.25);
+    }
+    body.dark-theme #map {
+      filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    }
   </style>
 </head>
 <body data-testid="dashboard-page">
@@ -602,6 +617,12 @@
       </a>
 
       <div class="side-section">Account</div>
+      <div style="padding: 0 10px; margin-bottom: 8px;">
+        <select class="select" id="theme-select" style="width: 100%; font-size: 13px; height: 36px; cursor: pointer;">
+          <option value="light">☀️ Light Theme</option>
+          <option value="dark">🌙 Dark Theme</option>
+        </select>
+      </div>
       <a href="#" class="side-link" id="logout-link" data-testid="nav-logout">
         <svg viewBox="0 0 24 24"><path d="M9 5h11v14H9"/><path d="M4 12h11"/><path d="M9 8l-4 4 4 4"/></svg>
         Sign out
@@ -837,6 +858,8 @@
               <div class="metric-row"><span>Mean luminance</span><b id="spec-lum">—</b></div>
               <div class="metric-row"><span>RGB balance</span><b id="spec-rgb">—</b></div>
               <div class="metric-row"><span>Model</span><b id="spec-model">—</b></div>
+              <div class="metric-row"><span>Needs Demolish</span><b id="spec-demolish" style="color:var(--danger)">—</b></div>
+              <div class="metric-row"><span>Estimated Repair Cost</span><b id="spec-cost">—</b></div>
             </div>
           </div>
         </div>
@@ -975,6 +998,10 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="/app.js"></script>
   <script>
+    // ---- Theme Logic ----
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-theme");
+    }
     if (!window.Auth.requireAuth()) {/* redirected */}
 
     const state = {
@@ -999,6 +1026,21 @@
       window.Auth.clear();
       window.location.href = "/login";
     });
+
+    // ---- Theme Selection ----
+    const themeSelect = document.getElementById("theme-select");
+    if (themeSelect) {
+      themeSelect.value = localStorage.getItem("theme") === "dark" ? "dark" : "light";
+      themeSelect.addEventListener("change", (e) => {
+        if (e.target.value === "dark") {
+          document.body.classList.add("dark-theme");
+          localStorage.setItem("theme", "dark");
+        } else {
+          document.body.classList.remove("dark-theme");
+          localStorage.setItem("theme", "light");
+        }
+      });
+    }
 
     // ---- Scroll to form ----
     document.getElementById("scroll-to-form").addEventListener("click", () => {
@@ -1231,6 +1273,8 @@
       document.getElementById("spec-lum").textContent = a.specs.luminance;
       document.getElementById("spec-rgb").textContent = a.specs.rgb.join(" / ");
       document.getElementById("spec-model").textContent = a.specs.model;
+      document.getElementById("spec-demolish").textContent = a.specs.demolish || "N/A";
+      document.getElementById("spec-cost").textContent = a.specs.cost || "N/A";
 
       document.getElementById("report-text").innerHTML = a.report.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
 
@@ -1243,6 +1287,13 @@
         }).addTo(window.projectMap);
         window.projectMarker = L.marker([51.505, -0.09]).addTo(window.projectMap)
             .bindPopup('A pretty CSS popup.<br> Easily customizable.');
+
+        if (!window.mapResizeObserver) {
+          window.mapResizeObserver = new ResizeObserver(() => {
+            if (window.projectMap) window.projectMap.invalidateSize();
+          });
+          window.mapResizeObserver.observe(document.getElementById('map'));
+        }
       }
 
       const geocode = (query) => {

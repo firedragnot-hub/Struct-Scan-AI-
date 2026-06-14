@@ -195,6 +195,18 @@
       .auth-aside .stat-grid, .auth-aside .quote { display: none; }
       .auth-main { padding: 40px 24px; }
     }
+    body.dark-theme {
+      --bg: #121212;
+      --bg-elev: #1e1e1e;
+      --bg-soft: #2a2a2a;
+      --bg-tint: #242424;
+      --ink: #ffffff;
+      --ink-2: #e0e0e0;
+      --muted: #a0a0a0;
+      --muted-2: #808080;
+      --line: rgba(255, 255, 255, 0.15);
+      --line-strong: rgba(255, 255, 255, 0.25);
+    }
   </style>
 </head>
 <body data-testid="signup-page">
@@ -260,6 +272,9 @@
 
   <script src="/app.js"></script>
   <script>
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-theme");
+    }
     window.Auth.redirectIfAuthed();
     const form = document.getElementById("signup-form");
     const errBox = document.getElementById("auth-error");

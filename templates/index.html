@@ -704,6 +704,18 @@
                 padding: 0 18px;
             }
         }
+        body.dark-theme {
+            --bg: #121212;
+            --bg-elev: #1e1e1e;
+            --bg-soft: #2a2a2a;
+            --bg-tint: #242424;
+            --ink: #ffffff;
+            --ink-2: #e0e0e0;
+            --muted: #a0a0a0;
+            --muted-2: #808080;
+            --line: rgba(255, 255, 255, 0.15);
+            --line-strong: rgba(255, 255, 255, 0.25);
+        }
     </style>
 </head>
 
@@ -722,6 +734,10 @@
                 <a href="#contact" data-testid="nav-contact">Contact</a>
             </div>
             <div class="nav-cta">
+                <select class="select" id="theme-select" style="width: auto; height: 36px; padding: 0 30px 0 14px; font-size: 13px; margin-right: 10px; cursor: pointer; background-color: var(--bg-elev); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius);">
+                    <option value="light">☀️ Light Theme</option>
+                    <option value="dark">🌙 Dark Theme</option>
+                </select>
                 <a href="/login" class="btn btn-ghost" data-testid="nav-login">Sign in</a>
                 <a href="/signup" class="btn btn-primary" data-testid="nav-signup">Get started</a>
             </div>
@@ -957,6 +973,24 @@
 
     <script src="/app.js"></script>
     <script>
+        // ---- Theme Selection ----
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark-theme");
+        }
+        const themeSelect = document.getElementById("theme-select");
+        if (themeSelect) {
+            themeSelect.value = localStorage.getItem("theme") === "dark" ? "dark" : "light";
+            themeSelect.addEventListener("change", (e) => {
+                if (e.target.value === "dark") {
+                    document.body.classList.add("dark-theme");
+                    localStorage.setItem("theme", "dark");
+                } else {
+                    document.body.classList.remove("dark-theme");
+                    localStorage.setItem("theme", "light");
+                }
+            });
+        }
+
         window.addEventListener("DOMContentLoaded", () => {
             window.initReveal();
         });

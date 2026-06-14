@@ -361,6 +361,16 @@ def analyze_project(project_id):
                 "confidence": round(random.uniform(max(50.0, confidence - 15.0), confidence), 1)
             })
 
+    needs_demolish = "Yes" if defect["risk"] == "high" and health_score < 45 else "No"
+    if defect["name"] == "Healthy Surface":
+        cost_inr = 0
+    elif defect["risk"] == "low":
+        cost_inr = random.randint(5000, 25000)
+    elif defect["risk"] == "medium":
+        cost_inr = random.randint(30000, 100000)
+    else:
+        cost_inr = random.randint(150000, 1000000)
+
     encoded_source = f"data:image/jpeg;base64,{base64.b64encode(img_bytes).decode()}"
     report_data = {
         "risk_level": defect["risk"],
@@ -377,7 +387,9 @@ def analyze_project(project_id):
             "edge_density": f"{round(random.uniform(0.1, 0.6), 3)} px⁻¹",
             "luminance": f"{random.randint(90, 180)} cd/m²",
             "rgb": [str(random.randint(90, 150)), str(random.randint(90, 150)), str(random.randint(90, 150))],
-            "model": "StructScan Core (Deterministic Simulation)"
+            "model": "StructScan Core (Deterministic Simulation)",
+            "demolish": needs_demolish,
+            "cost": f"₹ {cost_inr:,}"
         },
         "report": f"**STRUCTURAL DIAGNOSTIC REVIEWS**\nDiagnostic pass complete. {defect['desc']}" + cement_str
     }
