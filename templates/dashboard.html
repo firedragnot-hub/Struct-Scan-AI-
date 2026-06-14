@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   
   <style>
     /* StructScan AI — Premium Light Theme
@@ -839,6 +840,9 @@
             </div>
           </div>
         </div>
+
+        <div class="small-label" style="margin:22px 0 10px;">Location</div>
+        <div id="map" style="height:300px; border-radius:var(--radius); border:1px solid var(--line); margin-top: 10px; z-index: 1;"></div>
       </div>
 
       </div> <!-- end dash-home -->
@@ -968,6 +972,7 @@
     </div>
   </div>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="/app.js"></script>
   <script>
     if (!window.Auth.requireAuth()) {/* redirected */}
@@ -1228,6 +1233,53 @@
       document.getElementById("spec-model").textContent = a.specs.model;
 
       document.getElementById("report-text").innerHTML = a.report.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+
+      // Update Map
+      if (!window.projectMap) {
+        window.projectMap = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(window.projectMap);
+        window.projectMarker = L.marker([51.505, -0.09]).addTo(window.projectMap)
+            .bindPopup('A pretty CSS popup.<br> Easily customizable.');
+      }
+
+      const geocode = (query) => {
+        return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+          .then(res => res.json());
+      };
+
+      const parts = p.location.split(',').map(s => s.trim());
+      const cleanParts = parts.filter(pt => !/^\d+$/.test(pt)); // remove pure numbers (pincodes)
+
+      const tryGeocode = (pieces) => {
+          if (pieces.length === 0) {
+             window.projectMap.setView([51.505, -0.09], 13);
+             window.projectMarker.setLatLng([51.505, -0.09]).bindPopup('Location not found').openPopup();
+             return;
+          }
+          const query = pieces.join(', ');
+          geocode(query).then(data => {
+              if (data && data.length > 0) {
+                  const lat = parseFloat(data[0].lat);
+                  const lon = parseFloat(data[0].lon);
+                  window.projectMap.setView([lat, lon], 13);
+                  window.projectMarker.setLatLng([lat, lon]).bindPopup(escapeHtml(query)).openPopup();
+              } else {
+                  tryGeocode(pieces.slice(1));
+              }
+          }).catch(err => {
+              console.error("Map geocoding failed", err);
+              tryGeocode(pieces.slice(1));
+          });
+      };
+
+      tryGeocode(cleanParts);
+
+      setTimeout(() => {
+          window.projectMap.invalidateSize();
+      }, 100);
     }
 
     function animateNumber(el, target, duration) {
