@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify, session, render_template, send_from_d
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'super_secret_structscan_key'
+app.secret_key = 'super_secret_visionbuild_key'
 DB_PATH = 'users.db'
 
 # ==============================================================================
@@ -387,7 +387,7 @@ def analyze_project(project_id):
             "edge_density": f"{round(random.uniform(0.1, 0.6), 3)} px⁻¹",
             "luminance": f"{random.randint(90, 180)} cd/m²",
             "rgb": [str(random.randint(90, 150)), str(random.randint(90, 150)), str(random.randint(90, 150))],
-            "model": "StructScan Core (Deterministic Simulation)",
+            "model": "VisionBuild Core (Deterministic Simulation)",
             "demolish": needs_demolish,
             "cost": f"₹ {cost_inr:,}"
         },
