@@ -1,0 +1,9 @@
+path: ./dataset  # dataset root dir
+train: images/train  # train images (relative to 'path')
+val: images/val  # val images (relative to 'path')
+
+# Classes
+names:
+  0: defect_type_1
+  1: defect_type_2
+  2: defect_type_3
