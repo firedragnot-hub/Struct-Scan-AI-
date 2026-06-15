@@ -387,7 +387,7 @@ def analyze_project(project_id):
             "edge_density": f"{round(random.uniform(0.1, 0.6), 3)} px⁻¹",
             "luminance": f"{random.randint(90, 180)} cd/m²",
             "rgb": [str(random.randint(90, 150)), str(random.randint(90, 150)), str(random.randint(90, 150))],
-            "model": "VisionBuild Core (Deterministic Simulation)",
+            "model": "Vision Build Core (Deterministic Simulation)",
             "demolish": needs_demolish,
             "cost": f"₹ {cost_inr:,}"
         },
