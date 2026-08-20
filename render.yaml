@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: struct-scan-ai
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true

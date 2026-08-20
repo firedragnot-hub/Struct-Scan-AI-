@@ -124,9 +124,14 @@ dist_dir = os.path.join(os.path.dirname(__file__), 'frontend', 'dist')
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve_spa(path):
+    if path.startswith("api/"):
+        return jsonify({"error": "Resource not found."}), 404
     if path != "" and os.path.exists(os.path.join(dist_dir, path)):
         return send_from_directory(dist_dir, path)
-    return send_from_directory(dist_dir, "index.html")
+    if os.path.exists(os.path.join(dist_dir, "index.html")):
+        return send_from_directory(dist_dir, "index.html")
+    return jsonify({"status": "healthy", "service": "Struct-Scan AI API Engine"}), 200
+
 
 # ==============================================================================
 # Auth API
