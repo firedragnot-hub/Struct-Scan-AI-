@@ -3,4 +3,7 @@ torch
 torchvision
 pillow
 gunicorn
+ultralytics
+psycopg2-binary
+python-dotenv
 
